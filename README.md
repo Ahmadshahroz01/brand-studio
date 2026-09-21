@@ -22,7 +22,9 @@ set only by the user).
 - Next.js 16 (App Router, TypeScript, Tailwind v4)
 - Prisma 7 + Postgres (via `@prisma/adapter-pg`, driver-adapter model)
 - Auth.js (NextAuth v5) with Google OAuth, database sessions
-- Anthropic SDK (Claude) for content generation
+- Google Gemini (`gemini-2.5-flash`, free tier) for content generation.
+  Free tier means Google can use prompts/outputs for training, paid tier and
+  Vertex AI don't. Swap to a paid key or provider later if that matters.
 
 ## Local setup
 
@@ -40,7 +42,7 @@ npm run dev
 | `DATABASE_URL` | Provision a Postgres database (Vercel dashboard -> Storage -> Create Database -> Postgres/Neon, or any Postgres host) |
 | `AUTH_SECRET` | Run `npx auth secret` |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) -> OAuth 2.0 Client ID (Web application). Authorized redirect URI: `<your-domain>/api/auth/callback/google` (and `http://localhost:3000/api/auth/callback/google` for local dev) |
-| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) -> API Keys |
+| `GEMINI_API_KEY` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) -> Create API key. Free, no card required. |
 
 Set the same variables in Vercel: Project -> Settings -> Environment Variables.
 

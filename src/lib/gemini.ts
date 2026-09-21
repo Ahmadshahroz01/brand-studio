@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import type { BrandProfile, ContentType, TopPost } from "@prisma/client";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const CONTENT_TYPE_GUIDANCE: Record<ContentType, string> = {
   THOUGHT_LEADERSHIP:
@@ -31,21 +31,17 @@ export async function generatePostDrafts(params: {
         .join("\n\n")
     : "No past posts provided.";
 
-  const system = `You write LinkedIn posts for a real person's personal brand. Match their tone of voice exactly, using their past high-performing posts as the style reference. Never use em dashes. Never use generic LinkedIn cliches like "I'm excited to announce" or "Let's dive in". Write like a specific person, not a brand account. Output only the post text, no preamble, no explanation, no markdown formatting.`;
+  const systemInstruction = `You write LinkedIn posts for a real person's personal brand. Match their tone of voice exactly, using their past high-performing posts as the style reference. Never use em dashes. Never use generic LinkedIn cliches like "I'm excited to announce" or "Let's dive in". Write like a specific person, not a brand account. Output only the post text, no preamble, no explanation, no markdown formatting.`;
 
-  const user = `TONE OF VOICE (the user's own description):\n${brandProfile.toneOfVoice}\n\nINDUSTRY: ${brandProfile.industry}\n\nPAST HIGH-PERFORMING POSTS (style reference):\n${topPostsBlock}\n\nTASK: Write ${CONTENT_TYPE_GUIDANCE[contentType]}\n\nTOPIC: ${topic}\n\nWrite ${variantCount} distinct variant(s), separated by the exact delimiter "---VARIANT---" between each one. Each variant should take a different angle on the same topic, not just reworded sentences.`;
+  const prompt = `TONE OF VOICE (the user's own description):\n${brandProfile.toneOfVoice}\n\nINDUSTRY: ${brandProfile.industry}\n\nPAST HIGH-PERFORMING POSTS (style reference):\n${topPostsBlock}\n\nTASK: Write ${CONTENT_TYPE_GUIDANCE[contentType]}\n\nTOPIC: ${topic}\n\nWrite ${variantCount} distinct variant(s), separated by the exact delimiter "---VARIANT---" between each one. Each variant should take a different angle on the same topic, not just reworded sentences.`;
 
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-5",
-    max_tokens: 2048,
-    system,
-    messages: [{ role: "user", content: user }],
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+    config: { systemInstruction },
   });
 
-  const text = message.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("");
+  const text = response.text ?? "";
 
   return text
     .split("---VARIANT---")

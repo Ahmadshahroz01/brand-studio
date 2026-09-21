@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { generatePostDrafts } from "@/lib/anthropic";
+import { generatePostDrafts } from "@/lib/gemini";
 
 const bodySchema = z.object({
   topic: z.string().min(3).max(500),
@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured on the server." },
+      { error: "GEMINI_API_KEY is not configured on the server." },
       { status: 500 },
     );
   }
