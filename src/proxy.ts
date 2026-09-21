@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
-export default auth((req) => {
+const protectedProxy = auth((req) => {
   const isLoggedIn = !!req.auth;
   const isProtected =
     req.nextUrl.pathname.startsWith("/dashboard") ||
@@ -12,6 +12,16 @@ export default auth((req) => {
     return NextResponse.redirect(signInUrl);
   }
 });
+
+// Testing-only bypass, see getSession() in src/lib/auth.ts. Skips the
+// auth check entirely so /dashboard and /onboarding are reachable without
+// a real sign-in.
+export default function proxy(...args: Parameters<typeof protectedProxy>) {
+  if (process.env.DEV_BYPASS_AUTH === "true") {
+    return NextResponse.next();
+  }
+  return protectedProxy(...args);
+}
 
 export const config = {
   matcher: ["/dashboard/:path*", "/onboarding/:path*"],

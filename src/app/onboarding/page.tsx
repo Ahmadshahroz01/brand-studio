@@ -1,9 +1,9 @@
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { OnboardingForm } from "@/components/OnboardingForm";
 
 export default async function OnboardingPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) return null; // middleware guards this route
 
   const [brandProfile, referenceAccounts] = await Promise.all([

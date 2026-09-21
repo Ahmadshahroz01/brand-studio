@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { SignInButton } from "@/components/SignInButton";
 
 export default async function Home() {
-  const session = await auth();
+  const session = await getSession();
 
   if (session?.user?.id) {
     const brandProfile = await db.brandProfile.findUnique({

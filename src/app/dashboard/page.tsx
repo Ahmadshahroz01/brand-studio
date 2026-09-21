@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Dashboard } from "@/components/Dashboard";
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) return null; // middleware guards this route
 
   const brandProfile = await db.brandProfile.findUnique({
