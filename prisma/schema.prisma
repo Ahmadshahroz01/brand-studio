@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- Auth.js tables (shape required by @auth/prisma-adapter) ---
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts Account[]
+  sessions Session[]
+
+  brandProfile      BrandProfile?
+  referenceAccounts ReferenceAccount[]
+  posts             Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- App domain ---
+
+enum Industry {
+  TECHNOLOGY
+  MARKETING
+  DESIGN_CREATIVE
+  FINANCE
+  HEALTHCARE
+  EDUCATION
+  CONSULTING
+  SALES
+  HR_RECRUITING
+  OTHER
+}
+
+enum ContentType {
+  THOUGHT_LEADERSHIP
+  INSTRUCTIONAL
+  CHEAT_SHEET
+  PERSONAL_STORY
+}
+
+// One brand profile per user: the onboarding output that drives every AI generation.
+model BrandProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  linkedinProfileUrl String?
+  toneOfVoice        String   @db.Text
+  industry            Industry
+  contentTypes        ContentType[]
+
+  // Best-performing posts the user pastes in, used as few-shot style reference.
+  topPosts TopPost[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TopPost {
+  id             String       @id @default(cuid())
+  brandProfileId String
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+
+  content     String @db.Text
+  impressions Int?
+
+  createdAt DateTime @default(now())
+}
+
+// Accounts/voices the user wants to write in a similar spirit to. Manually entered, never scraped.
+model ReferenceAccount {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  profileUrl  String?
+  notes       String? @db.Text
+
+  createdAt DateTime @default(now())
+}
+
+enum PostStatus {
+  DRAFT
+  POSTED
+}
+
+model Post {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  content     String      @db.Text
+  contentType ContentType
+  status      PostStatus  @default(DRAFT)
+
+  // Intent, not a guarantee: when the user plans to post it. Drives the reminder.
+  scheduledAt DateTime?
+  // Set automatically the moment "Mark as Posted" is clicked. Can happen any time relative to scheduledAt.
+  postedAt    DateTime?
+
+  // How many minutes before scheduledAt the reminder should fire. Null = no reminder.
+  reminderLeadMinutes Int?
+  reminderSentAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+}
