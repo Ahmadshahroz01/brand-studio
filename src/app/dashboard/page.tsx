@@ -20,10 +20,10 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Content queue</h1>
+        <h1 className="text-2xl leading-8 tracking-tight text-on-surface">Content queue</h1>
         <a
           href="/onboarding"
-          className="text-sm font-medium text-neutral-500 hover:text-neutral-900"
+          className="rounded-full px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/8"
         >
           Edit brand profile
         </a>

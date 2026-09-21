@@ -16,10 +16,10 @@ export default async function OnboardingPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight">
+      <h1 className="text-2xl leading-8 tracking-tight text-on-surface">
         Set up your brand profile
       </h1>
-      <p className="mt-2 text-sm text-neutral-600">
+      <p className="mt-2 text-sm text-on-surface-variant">
         This is what every generated draft is built from. Better input here means
         less editing later.
       </p>

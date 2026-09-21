@@ -16,8 +16,8 @@ export default async function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Brand Studio</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <h1 className="text-2xl leading-8 tracking-tight text-on-surface">Brand Studio</h1>
+        <p className="mt-2 text-sm leading-5 text-on-surface-variant">
           Strategy, tone of voice, and drafting for a personal LinkedIn presence.
         </p>
         <div className="mt-8">

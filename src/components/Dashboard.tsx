@@ -17,6 +17,9 @@ const REMINDER_OPTIONS = [
   ["1440", "1 day before"],
 ] as const;
 
+const fieldClass =
+  "rounded-xs border border-outline-variant bg-transparent px-2.5 py-1.5 text-xs text-on-surface focus:border-2 focus:border-primary focus:outline-none";
+
 function isOverdue(post: Post) {
   return (
     post.status === "DRAFT" &&
@@ -113,22 +116,22 @@ export function Dashboard({
     <div className="mt-6">
       <button
         onClick={() => setShowGenerate(true)}
-        className="rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700"
+        className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-on-primary transition hover:brightness-95"
       >
         Generate content
       </button>
 
       {showGenerate && (
-        <div className="mt-4 rounded-xl border border-neutral-300 bg-white p-5">
+        <div className="mt-4 rounded-md border border-outline-variant bg-surface-container-low p-5">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto]">
             <input
-              className="rounded-lg border border-neutral-300 p-2.5 text-sm"
+              className="rounded-xs border border-outline bg-transparent p-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-2 focus:border-primary focus:outline-none"
               placeholder="Topic, e.g. 'why most onboarding flows fail'"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
             />
             <select
-              className="rounded-lg border border-neutral-300 p-2.5 text-sm"
+              className="rounded-xs border border-outline bg-surface-container-low p-2.5 text-sm text-on-surface focus:border-2 focus:border-primary focus:outline-none"
               value={contentType}
               onChange={(e) => setContentType(e.target.value)}
             >
@@ -141,7 +144,7 @@ export function Dashboard({
               )}
             </select>
             <select
-              className="rounded-lg border border-neutral-300 p-2.5 text-sm"
+              className="rounded-xs border border-outline bg-surface-container-low p-2.5 text-sm text-on-surface focus:border-2 focus:border-primary focus:outline-none"
               value={variantCount}
               onChange={(e) => setVariantCount(Number(e.target.value))}
             >
@@ -154,7 +157,7 @@ export function Dashboard({
             <button
               onClick={generate}
               disabled={generating || topic.trim().length < 3}
-              className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+              className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-on-primary transition hover:brightness-95 disabled:opacity-40"
             >
               {generating ? "Writing..." : "Write drafts"}
             </button>
@@ -164,21 +167,21 @@ export function Dashboard({
                 setVariants([]);
                 setGenError(null);
               }}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-neutral-600"
+              className="rounded-full px-5 py-2 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high"
             >
               Close
             </button>
           </div>
-          {genError && <p className="mt-3 text-sm text-red-600">{genError}</p>}
+          {genError && <p className="mt-3 text-sm text-error">{genError}</p>}
 
           {variants.length > 0 && (
             <div className="mt-5 space-y-3">
               {variants.map((v, i) => (
-                <div key={i} className="rounded-lg border border-neutral-200 p-3">
-                  <p className="whitespace-pre-wrap text-sm">{v}</p>
+                <div key={i} className="rounded-md border border-outline-variant bg-surface-container-lowest p-3">
+                  <p className="whitespace-pre-wrap text-sm text-on-surface">{v}</p>
                   <button
                     onClick={() => saveDraft(v)}
-                    className="mt-3 rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-900 hover:bg-neutral-200"
+                    className="mt-3 rounded-full bg-secondary-container px-3 py-1.5 text-xs font-medium text-on-secondary-container hover:brightness-95"
                   >
                     Save to queue
                   </button>
@@ -190,37 +193,41 @@ export function Dashboard({
       )}
 
       <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="text-sm font-medium tracking-wide text-on-surface-variant uppercase">
           Queue ({drafts.length})
         </h2>
         <div className="mt-3 space-y-3">
           {drafts.length === 0 && (
-            <p className="text-sm text-neutral-500">No drafts yet. Generate your first one above.</p>
+            <p className="text-sm text-on-surface-variant">
+              No drafts yet. Generate your first one above.
+            </p>
           )}
           {drafts.map((post) => (
             <div
               key={post.id}
-              className={`rounded-xl border p-4 ${
-                isOverdue(post) ? "border-red-300 bg-red-50" : "border-neutral-200 bg-white"
+              className={`rounded-md border p-4 ${
+                isOverdue(post)
+                  ? "border-error/40 bg-error-container/40"
+                  : "border-outline-variant bg-surface-container-low"
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-700">
+                <span className="rounded-full bg-secondary-container px-2.5 py-0.5 text-xs font-medium text-on-secondary-container">
                   {CONTENT_TYPE_LABELS[post.contentType]}
                 </span>
                 {isOverdue(post) && (
-                  <span className="text-xs font-medium text-red-700">
+                  <span className="text-xs font-medium text-error">
                     Overdue, not marked posted
                   </span>
                 )}
               </div>
 
-              <p className="mt-3 whitespace-pre-wrap text-sm text-neutral-800">{post.content}</p>
+              <p className="mt-3 whitespace-pre-wrap text-sm text-on-surface">{post.content}</p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <input
                   type="datetime-local"
-                  className="rounded-lg border border-neutral-300 px-2 py-1.5 text-xs"
+                  className={fieldClass}
                   value={toDatetimeLocalValue(post.scheduledAt)}
                   onChange={(e) =>
                     patchPost(post.id, {
@@ -229,7 +236,7 @@ export function Dashboard({
                   }
                 />
                 <select
-                  className="rounded-lg border border-neutral-300 px-2 py-1.5 text-xs"
+                  className={fieldClass}
                   value={post.reminderLeadMinutes ?? ""}
                   onChange={(e) =>
                     patchPost(post.id, {
@@ -247,19 +254,19 @@ export function Dashboard({
                 <div className="ml-auto flex gap-2">
                   <button
                     onClick={() => copy(post)}
-                    className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
+                    className="rounded-full border border-outline px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/8"
                   >
                     {copiedId === post.id ? "Copied" : "Copy to clipboard"}
                   </button>
                   <button
                     onClick={() => patchPost(post.id, { markPosted: true })}
-                    className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700"
+                    className="rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-on-primary hover:brightness-95"
                   >
                     Mark as posted
                   </button>
                   <button
                     onClick={() => deletePost(post.id)}
-                    className="rounded-lg px-2 py-1.5 text-xs font-medium text-neutral-400 hover:text-red-600"
+                    className="rounded-full px-2 py-1.5 text-xs font-medium text-on-surface-variant hover:text-error"
                   >
                     Delete
                   </button>
@@ -272,21 +279,24 @@ export function Dashboard({
 
       {published.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+          <h2 className="text-sm font-medium tracking-wide text-on-surface-variant uppercase">
             Posted ({published.length})
           </h2>
           <div className="mt-3 space-y-2">
             {published.map((post) => (
-              <div key={post.id} className="rounded-xl border border-neutral-200 bg-white p-4 opacity-70">
+              <div
+                key={post.id}
+                className="rounded-md border border-outline-variant bg-surface-container-low p-4 opacity-70"
+              >
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-700">
+                  <span className="rounded-full bg-secondary-container px-2.5 py-0.5 text-xs font-medium text-on-secondary-container">
                     {CONTENT_TYPE_LABELS[post.contentType]}
                   </span>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-xs text-on-surface-variant">
                     Posted {post.postedAt ? new Date(post.postedAt).toLocaleString() : ""}
                   </span>
                 </div>
-                <p className="mt-2 line-clamp-2 whitespace-pre-wrap text-sm text-neutral-600">
+                <p className="mt-2 line-clamp-2 whitespace-pre-wrap text-sm text-on-surface-variant">
                   {post.content}
                 </p>
               </div>

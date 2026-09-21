@@ -13,6 +13,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",
     "@auth/prisma-adapter": "^2.11.3",
+    "@material/material-color-utilities": "^0.4.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "date-fns": "^4.4.0",
